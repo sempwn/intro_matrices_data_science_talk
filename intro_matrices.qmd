@@ -1,0 +1,118 @@
+---
+preload-iframes: true
+format:
+  revealjs:
+    preload-iframes: true
+    margin: 0.05
+    chalkboard: true
+    css: slides.css
+    logo: figs/BCCDC_Logo_RGB_300px.png
+    theme: sky
+    transition: slide
+    background-transition: fade
+    view-distance: 9
+    auto-stretch: true
+    scrollable: true
+---
+
+```{r}
+#| include: false
+# need this otherwise Quarto doesn't execute inline code
+# See: https://github.com/quarto-dev/quarto-cli/discussions/4855
+1 + 1
+```
+
+
+# {background-iframe="hello-matrix/index.html"}
+
+::: {style="background-color: #ffffffbb; border-radius: 10px; padding: 5px;"}
+::: r-fit-text 
+::: {.center-text}
+Some math behind
+:::
+:::
+
+::: r-fit-text 
+::: {.center-text}
+deep learning
+:::
+:::
+
+
+::: {.center-text}
+Mike Irvine
+:::
+
+  
+
+::: {.center-text}
+`r format(Sys.time(), '%d %B, %Y')`
+:::  
+
+:::
+
+
+```{=html}
+<div class="footer">iframe derived from <a href="https://github.com/EmilHvitfeldt/quarto-iframe-examples">EmilHvitfeldt</a></div>
+```
+
+## Ideas for talk
+
+- [The random transformer](https://osanseviero.github.io/hackerllama/blog/posts/random_transformer/#self-attention)
+- [key value query concept for retrieval systems](https://stats.stackexchange.com/questions/421935/what-exactly-are-keys-queries-and-values-in-attention-mechanisms)
+
+## Motivation
+
+## What is a Version Control System? {background-image="figs/martin-sanchez.jpg" background-opacity=0.2 }
+
+::: {.incremental}
+- $$\text{softmax}\left(\frac{KQ^T}{\sqrt{d}} \right)V$$
+- What is a matrix and why is it useful for modeling data?
+- What is an embedding and how are they used in deep learning models?
+- What is the self-attention mechanism inside a transformer model?
+:::
+
+
+
+## {.center background-image="figs/martin-sanchez.jpg" background-opacity=0.5}
+
+
+::: {.center-text style="background-color: #ffffffbb; border-radius: 10px; padding: 5px;"}
+What is a Version Control System?
+:::
+
+
+
+```{=html}
+<div class="footer">
+Photo by <a href="https://unsplash.com/@martinsanchez?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Martin Sanchez</a> on <a href="https://unsplash.com/photos/red-and-white-star-illustration-SL1co_Etck8?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
+</div>
+```
+
+## What is a Version Control System? {background-image="figs/martin-sanchez.jpg" background-opacity=0.2}
+
+:::: {.columns}
+
+::: {.column width="60%"}
+- Rational way of dealing with multiple people working concurrently on same files
+- Tracks who makes changes, when they made changes, and what they changed
+- Maintains multiple versions of the same project 
+
+:::
+
+::: {.column width="40%"}
+![](figs/version-control-comic.png)
+:::
+
+::::
+
+
+# {.center background-iframe="hello-matrix/index.html"}
+
+::: {style="background-color: #ffffffbb; border-radius: 10px; padding: 5px;"}
+::: r-fit-text 
+::: {.center-text}
+Questions?
+:::
+:::
+:::
