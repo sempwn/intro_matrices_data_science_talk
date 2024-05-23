@@ -7,7 +7,7 @@ format:
     chalkboard: true
     css: slides.css
     logo: figs/BCCDC_Logo_RGB_300px.png
-    theme: sky
+    theme: simple
     transition: slide
     background-transition: fade
     view-distance: 9
@@ -19,99 +19,394 @@ format:
 #| include: false
 # need this otherwise Quarto doesn't execute inline code
 # See: https://github.com/quarto-dev/quarto-cli/discussions/4855
-1 + 1
+
+library(tidyverse)
+
+nice_matrix_plot <- function(dat,xlabs=NULL,ylabs=NULL){
+  ## convert to tibble, add row identifier, and shape "long"
+  # for this scaling hack see: https://stackoverflow.com/questions/25061822/ggplot-geom-text-font-size-control
+  geom.text.size <- 18
+  theme.size <- (14/5) * geom.text.size
+  
+  if(is.null(xlabs)){
+    xlabs <- 1:ncol(dat)
+  }
+  if(is.null(ylabs)){
+    ylabs <- 1:nrow(dat)
+  }
+  dat2 <-
+    t(dat) %>%
+    as_tibble() %>%
+    rownames_to_column("Var1") %>%
+    pivot_longer(-Var1, names_to = "Var2", values_to = "value") %>%
+    mutate(
+      Var2 = gsub("V", "", Var2)
+    ) %>%
+    left_join(tibble(Var1 = as.character(1:length(xlabs)), xlab = xlabs)) %>%
+    left_join(tibble(Var2 = as.character(1:length(ylabs)), ylab = rev(ylabs))) %>%
+    mutate(
+      Var1 = factor(xlab, levels = xlabs),
+      Var2 = factor(ylab, levels = rev(ylabs))
+    )
+  
+  
+  ggplot(dat2, aes(Var1, Var2)) +
+    geom_tile(aes(fill = value)) +
+    geom_text(aes(label = round(value, 1)),
+              size=geom.text.size) +
+    scale_fill_gradient2() +
+    ggplot2::theme_minimal() +
+    labs(x="",y="") +
+    theme(legend.position = "none",
+          text=element_text(size = theme.size))
+}
+
+plot_vectors <- function(vectors, show_arrows = TRUE,
+                         add_arrows = FALSE){
+  geom.text.size <- 15
+  theme.size <- (14/5) * geom.text.size
+  p <- ggplot() +
+    geom_vline(xintercept = 0) +
+    geom_hline(yintercept=0) +
+    geom_point(aes(x=0,y=0)) +
+    theme_minimal() +
+    theme(text=element_text(size = theme.size))
+
+  x_origin <- 0
+  y_origin <- 0
+  for(v in vectors){
+
+    if(show_arrows){
+      p <- p +
+        annotate("segment", 
+                 x=x_origin,
+                 y=y_origin,
+                 xend=x_origin + as.numeric(v[1]),
+                 yend=y_origin + as.numeric(v[2]),
+                 linewidth = 2,
+                 arrow=arrow(length = unit(0.5,"cm")))
+    }
+      p <- p +
+      annotate("text",
+               x=x_origin + as.numeric(v[1]),
+               y=y_origin + as.numeric(v[2]),
+               label=v[3],size=9,colour="red",
+               size=theme.size)
+      if(add_arrows){
+        x_origin <- x_origin + as.numeric(v[1])
+        y_origin <- y_origin + as.numeric(v[2])
+      }
+  }
+  
+  return(p)
+}
 ```
 
-
-# {background-iframe="hello-matrix/index.html"}
+#  {background-iframe="hello-matrix/index.html"}
 
 ::: {style="background-color: #ffffffbb; border-radius: 10px; padding: 5px;"}
-::: r-fit-text 
-::: {.center-text}
+::: r-fit-text
+::: center-text
 Some math behind
 :::
 :::
 
-::: r-fit-text 
-::: {.center-text}
+::: r-fit-text
+::: center-text
 deep learning
 :::
 :::
 
-
-::: {.center-text}
+::: center-text
 Mike Irvine
 :::
 
-  
-
-::: {.center-text}
+::: center-text
 `r format(Sys.time(), '%d %B, %Y')`
-:::  
-
 :::
-
+:::
 
 ```{=html}
 <div class="footer">iframe derived from <a href="https://github.com/EmilHvitfeldt/quarto-iframe-examples">EmilHvitfeldt</a></div>
 ```
-
 ## Ideas for talk
 
-- [The random transformer](https://osanseviero.github.io/hackerllama/blog/posts/random_transformer/#self-attention)
-- [key value query concept for retrieval systems](https://stats.stackexchange.com/questions/421935/what-exactly-are-keys-queries-and-values-in-attention-mechanisms)
+-   [The random transformer](https://osanseviero.github.io/hackerllama/blog/posts/random_transformer/#self-attention)
+-   [key value query concept for retrieval systems](https://stats.stackexchange.com/questions/421935/what-exactly-are-keys-queries-and-values-in-attention-mechanisms)
 
-## Motivation
+# Motivation {background-image="figs/martin-sanchez.jpg" background-opacity="0.2"}
 
-## What is a Version Control System? {background-image="figs/martin-sanchez.jpg" background-opacity=0.2 }
+::: incremental
+-   $$\text{softmax}\left(\frac{KQ^T}{\sqrt{d}} \right)V$$
 
-::: {.incremental}
-- $$\text{softmax}\left(\frac{KQ^T}{\sqrt{d}} \right)V$$
-- What is a matrix and why is it useful for modeling data?
-- What is an embedding and how are they used in deep learning models?
-- What is the self-attention mechanism inside a transformer model?
+-   What is a matrix and why is it useful for modeling data?
+
+-   What is an embedding and how are they used in deep learning models?
+
+-   What is the self-attention mechanism inside a transformer model?
 :::
 
+##  {auto-animate="true"}
 
-
-## {.center background-image="figs/martin-sanchez.jpg" background-opacity=0.5}
-
-
-::: {.center-text style="background-color: #ffffffbb; border-radius: 10px; padding: 5px;"}
-What is a Version Control System?
+::: {style="margin-top: 20%; font-size: 3em;"}
+$5x = 15$
 :::
 
+##  {auto-animate="true"}
 
+::: {style="margin-top: 20%; font-size: 3em;"}
+$5x = 15$
+:::
 
-```{=html}
-<div class="footer">
-Photo by <a href="https://unsplash.com/@martinsanchez?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Martin Sanchez</a> on <a href="https://unsplash.com/photos/red-and-white-star-illustration-SL1co_Etck8?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
-</div>
+::: {style="font-size: 3em;"}
+$x = 3$
+:::
+
+##  {auto-animate="true"}
+
+::: {style="margin-top: 20%; font-size: 3em;"}
+$5x = 15$
+:::
+
+::: {style="font-size: 3em; color: red;"}
+$x = 3$
+:::
+
+##  {auto-animate="true"}
+
+::: {style="margin-top: 20%; font-size: 3em;"}
+$5x + y = 15$
+:::
+
+##  {auto-animate="true"}
+
+::: {style="margin-top: 20%; font-size: 3em;"}
+$5x + y = 15$
+:::
+
+::: {style="font-size: 3em;"}
+$(x, 15 - 5x)$
+:::
+
+##  {auto-animate="true"}
+
+::: {style="font-size: 3em; color: blue;"}
+$(x, 15 - 5x)$
+:::
+
+##  {auto-animate="true"}
+
+::: {style="font-size: 3em; color: blue;"}
+$(x, 15 - 5x)$
+:::
+
+::: {style="font-size: 3em;"}
+$(1, 10)$
+:::
+
+##  {auto-animate="true"}
+
+::: {style="font-size: 3em; color: blue;"}
+$(x, 15 - 5x)$
+:::
+
+::: {style="font-size: 3em;"}
+$(1, 10)$
+:::
+
+::: {style="font-size: 3em;"}
+$(2, 5)$
+:::
+
+##  {auto-animate="true"}
+
+::: {style="font-size: 3em; color: blue;"}
+$(x, 15 - 5x)$
+:::
+
+::: {style="font-size: 3em;"}
+$(1, 10)$
+:::
+
+::: {style="font-size: 3em;"}
+$(2, 5)$
+:::
+
+::: {style="font-size: 3em;"}
+$(3, 0)$
+:::
+
+##  {auto-animate="true"}
+
+::: {style="margin-top: 20%; font-size: 3em;"}
+$5x + y = 15$
+:::
+
+##  {auto-animate="true"}
+
+::: {style="margin-top: 20%; font-size: 3em;"}
+$5x + y = 15$
+:::
+
+::: {style="font-size: 3em;"}
+$3x + 2y = 16$
+:::
+
+##  {auto-animate="true"}
+
+::: {style="margin-top: 5%; font-size: 3em;"}
+$5x + y = 15$
+:::
+
+::: {style="font-size: 3em;"}
+$3x + 2y = 16$
+:::
+
+::: {style="font-size: 3em;"}
+$x = 2, y = 5$
+:::
+
+##  {auto-animate="true" auto-animate-easing="ease-in-out"}
+
+::: {data-id="box1" style="margin-top: 10%; font-size: 3em;"}
+$5x + y = 15$ $3x + 2y = 16$
+:::
+
+##  {auto-animate="true" auto-animate-easing="ease-in-out"}
+
+::: {data-id="box1" style="margin-top: 10%; font-size: 3em;"}
+$ax + by = e$ $cx + dy = f$
+:::
+
+##  {auto-animate="true" auto-animate-easing="ease-in-out"}
+
+::: {data-id="box1" style="margin-top: 10%; font-size: 2em;"}
+$$\begin{pmatrix}
+a & b\\ c & d
+\end{pmatrix} 
+\begin{pmatrix}
+x\\y
+\end{pmatrix} =
+\begin{pmatrix}
+e\\f
+\end{pmatrix}
+$$
+:::
+
+##  {auto-animate="true"}
+
+::: {data-id="box1" style="margin-top: 25%; font-size: 2em;"}
+$$
+A\mathbf{x} = \mathbf{y}
+$$
+:::
+
+## What is a matrix?
+
+::: incremental
+-   A way of generalizing the previous example to any number of dimensions and variables
+
+-   A representation of a linear map for a fixed basis
+:::
+
+## What is a basis? {auto-animate="true"  auto-animate-easing="ease"}
+
+```{r}
+#| echo: false
+v1 <- c(2,4,"P")
+vectors <- list(v1)
+p <- plot_vectors(vectors, show_arrows = F)
+
+show(p)
+
 ```
 
-## What is a Version Control System? {background-image="figs/martin-sanchez.jpg" background-opacity=0.2}
 
-:::: {.columns}
+## What is a basis? {auto-animate="true"  auto-animate-easing="ease"}
 
+```{r}
+#| echo: false
+v1 <- c(2,4,"P")
+vectors <- list(v1)
+p <- plot_vectors(vectors, show_arrows = T)
+
+show(p)
+
+```
+
+## What is a basis? {auto-animate="true"  auto-animate-easing="ease"}
+
+```{r}
+#| echo: false
+
+v1 <- c(2,4,"P")
+vectors <- list(
+  c(1,0,""),
+  c(0,1,""),
+  v1
+)
+p <- plot_vectors(vectors, show_arrows = T)
+
+show(p)
+
+```
+
+## What is a linear map?
+
+![](figs/talk_diagrams/Slide1.PNG){fig-align="center"}
+
+## What is a linear map?
+
+-   A map from one vector space $U$ to a vector space $V$ . Usually denoted $T: U \to V$
+
+-   With additivity: $\mathbf{u},\mathbf{v} \in U$, $T(\mathbf{u} + \mathbf{v}) = T(\mathbf{u}) + T(\mathbf{v})$
+
+-   and scalar multiplication: $c \in \mathbb{R}, u \in U$, $T(c\mathbf{u}) = cT(\mathbf{u})$
+
+## Why are linear maps useful for machine learning? {auto-animate="true"  auto-animate-easing="ease"}
+
+![](figs/talk_diagrams/Slide1.PNG){fig-align="center"}
+
+## Why are linear maps useful for machine learning? {auto-animate="true"  auto-animate-easing="ease"}
+
+![](figs/talk_diagrams/Slide2.PNG){fig-align="center"}
+
+
+## What is a Version Control System? {background-image="figs/martin-sanchez.jpg" background-opacity="0.2"}
+
+::: columns
 ::: {.column width="60%"}
-- Rational way of dealing with multiple people working concurrently on same files
-- Tracks who makes changes, when they made changes, and what they changed
-- Maintains multiple versions of the same project 
-
+-   Rational way of dealing with multiple people working concurrently on same files
+-   Tracks who makes changes, when they made changes, and what they changed
+-   Maintains multiple versions of the same project
 :::
 
 ::: {.column width="40%"}
 ![](figs/version-control-comic.png)
 :::
+:::
 
-::::
+## Query matrix
 
+```{r}
+#| echo: false
+QX <- matrix(c(
+  2.0, 1.0, -5,
+  2.0, -2, -6
+), ncol = 3, nrow = 2
+)
 
-# {.center background-iframe="hello-matrix/index.html"}
+nice_matrix_plot(QX,
+  xlabs = c("pet", "outdoors", "food"),
+  ylabs = c("dog", "cat")
+)
+```
+
+#  {.center background-iframe="hello-matrix/index.html"}
 
 ::: {style="background-color: #ffffffbb; border-radius: 10px; padding: 5px;"}
-::: r-fit-text 
-::: {.center-text}
+::: r-fit-text
+::: center-text
 Questions?
 :::
 :::
